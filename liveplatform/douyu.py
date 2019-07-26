@@ -5,6 +5,7 @@ import requests
 from datetime import datetime
 from liveplatform.live_platform_base import LivePlatformBase
 import logging
+import config.config
 
 
 class Douyu(LivePlatformBase):
@@ -12,7 +13,10 @@ class Douyu(LivePlatformBase):
         caps = DesiredCapabilities.CHROME
         caps["goog:loggingPrefs"] = {"performance": "ALL"}
 
-        driver = webdriver.Chrome(desired_capabilities=caps, executable_path="../util/chromedriver.exe")
+        driver = webdriver.Chrome(
+            desired_capabilities=caps,
+            executable_path=config.config.chrome_driver_config['executable_path']
+        )
         driver.get("https://www.douyu.com/{}".format(room_id))
 
         performance_data = driver.get_log("performance")

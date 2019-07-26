@@ -13,6 +13,7 @@ def probe_and_download(name, live_platform_name, room_id, download_path):
         logging.info("skip probe {}: downloading status = True".format(name))
         return
 
+    # try:
     lp = liveplatform.factory.live_platform_factory(live_platform_name)
     is_streaming = lp.probe_room(room_id)
     if is_streaming:
@@ -22,9 +23,13 @@ def probe_and_download(name, live_platform_name, room_id, download_path):
         config.download_status[name] = False
     else:
         logging.info("{} not streaming".format(name))
+    # except:
+    #     logging.error("{} task error".format(name))
+    # finally:
+    #     config.download_status[name] = False
 
 
-if __name__ == '__main__':
+def task_start():
     logging.basicConfig(
         level=config.log_config['level'],
         filename=config.log_config['file_name'],
@@ -45,7 +50,8 @@ if __name__ == '__main__':
                 task_data['download_path']
             ],
             id=task_data['name'],
-            minutes=1
+            seconds=10,
+            # minutes=1
         )
         if not config.download_status.__contains__(task_data['name']):
             config.download_status[task_data['name']] = False

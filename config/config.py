@@ -1,17 +1,31 @@
 import logging
 
+chrome_driver_config = {
+    # "executable_path": "util/chromedriver.exe",
+    "executable_path": "util/chromedriver.exe"
+}
+
 task_config = [
     {
         "name": "qike",
         "live_platform_name": "douyu",
         "room_id": "120219",
-        "download_path": "D:/qike/"
+        # "download_path": "D:/qike/",
+        "download_path": "/mnt/pi_extend/stream/qike/",
     },
     {
         "name": "zhou",
         "live_platform_name": "douyu",
         "room_id": "88660",
-        "download_path": "D:/zhou/"
+        # "download_path": "D:/zhou/",
+        "download_path": "/mnt/pi_extend/stream/zhou/",
+    },
+    {
+        "name": "xiaojinzhe",
+        "live_platform_name": "huya",
+        "room_id": "xiaojinzhe",
+        # "download_path": "D:/xiaojinzhe/",
+        "download_path": "/mnt/pi_extend/stream/xiaojinzhe/",
     }
 
 ]
