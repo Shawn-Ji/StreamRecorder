@@ -50,8 +50,7 @@ def task_start():
                 task_data['download_path']
             ],
             id=task_data['name'],
-            seconds=10,
-            # minutes=1
+            minutes=1
         )
         if not config.download_status.__contains__(task_data['name']):
             config.download_status[task_data['name']] = False
