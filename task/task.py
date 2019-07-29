@@ -9,24 +9,17 @@ import logging
 def probe_and_download(name, live_platform_name, room_id, download_path):
     logging.info("{} job".format(name))
 
-    if config.download_status[name] == True:
-        logging.info("skip probe {}: downloading status = True".format(name))
-        return
 
     # try:
     lp = liveplatform.factory.live_platform_factory(live_platform_name)
     is_streaming = lp.probe_room(room_id)
     if is_streaming:
         logging.info("{} is streaming".format(name))
-        config.download_status[name] = True
         lp.download_stream(room_id, download_path)
-        config.download_status[name] = False
     else:
         logging.info("{} not streaming".format(name))
     # except:
     #     logging.error("{} task error".format(name))
-    # finally:
-    #     config.download_status[name] = False
 
 
 def task_start():
@@ -50,10 +43,10 @@ def task_start():
                 task_data['download_path']
             ],
             id=task_data['name'],
-            minutes=1
+            # minutes=1,
+            seconds=10,
+            max_instances=1
         )
-        if not config.download_status.__contains__(task_data['name']):
-            config.download_status[task_data['name']] = False
 
         logging.info("add job {}".format(task_data['name']))
 

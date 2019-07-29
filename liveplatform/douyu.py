@@ -10,11 +10,23 @@ import config.config
 
 class Douyu(LivePlatformBase):
     def __get_rtmp(self, room_id):
-        caps = DesiredCapabilities.CHROME
-        caps["goog:loggingPrefs"] = {"performance": "ALL"}
+
+        if config.config.chrome_driver_config["version"] is None:
+            driver = webdriver.Chrome(
+                executable_path=config.config.chrome_driver_config['executable_path']
+            )
+            config.config.chrome_driver_config["version"] = driver.capabilities['chrome']['chromedriverVersion']
+            logging.info("chromedriver version={}".format(driver.capabilities['chrome']['chromedriverVersion']))
+            driver.quit()
+
+        desired_caps = DesiredCapabilities.CHROME
+        if int(config.config.chrome_driver_config["version"][0:2]) >= 75:
+            desired_caps["goog:loggingPrefs"] = {"performance": "ALL"}
+        else:
+            desired_caps["loggingPrefs"] = {"performance": "ALL"}
 
         driver = webdriver.Chrome(
-            desired_capabilities=caps,
+            desired_capabilities=desired_caps,
             executable_path=config.config.chrome_driver_config['executable_path']
         )
         driver.get("https://www.douyu.com/{}".format(room_id))
@@ -74,12 +86,10 @@ class Douyu(LivePlatformBase):
         )
 
         if response.status_code != 200:
-            # logging.debug("error when downloading rtmp stream")
+            logging.debug("error when downloading rtmp stream")
             return None
         else:
-            pass
-            # logging.debug("download start")
-            # print(response)
+            logging.debug("download response status code = 200... download start")
 
         file_name = path
         file_name.replace("\\", "/")
@@ -92,21 +102,24 @@ class Douyu(LivePlatformBase):
                 if chunk:
                     counter = counter + 1
                     f.write(chunk)
-                    if counter % 10 == 0:
-                        print("chunk:{}M".format(counter / 10))
+                    # if counter % 10 == 0:
+                    #     print("chunk:{}M".format(counter / 10))
+                    if counter % 100 == 0:
+                        logging.info("{} stream download: {}M".format(room_id, counter / 100))
                     f.close()
                     f = open(file_name, 'ab+')
         return file_name
 
+
 if __name__ == '__main__':
-    room_id = 120219
+    room_id = 64609
 
     douyu = Douyu()
 
     is_streaming = douyu.probe_room(room_id)
 
     if is_streaming:
+        print("{} is streaming".format(room_id))
         douyu.download_stream(room_id, "D:/qike/")
     else:
         print("{} not streaming".format(room_id))
-
