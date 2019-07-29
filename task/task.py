@@ -43,8 +43,7 @@ def task_start():
                 task_data['download_path']
             ],
             id=task_data['name'],
-            # minutes=1,
-            seconds=10,
+            minutes=1,
             max_instances=1
         )
 
