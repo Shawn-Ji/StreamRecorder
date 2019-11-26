@@ -86,8 +86,9 @@ class Huya(LivePlatformBase):
                     f.write(chunk)
                     if counter % 10 == 0:
                         print("chunk:{}M".format(counter / 10))
-                    f.close()
-                    f = open(file_name, 'ab+')
+                    f.flush()
+                    # f.close()
+                    # f = open(file_name, 'ab+')
         return file_name
 
 
