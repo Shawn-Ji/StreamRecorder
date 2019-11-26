@@ -102,12 +102,11 @@ class Douyu(LivePlatformBase):
                 if chunk:
                     counter = counter + 1
                     f.write(chunk)
-                    # if counter % 10 == 0:
-                    #     print("chunk:{}M".format(counter / 10))
                     if counter % 100 == 0:
                         logging.info("{} stream download: {}M".format(room_id, counter / 100))
-                    f.close()
-                    f = open(file_name, 'ab+')
+                    f.flush()
+                    # f.close()
+                    # f = open(file_name, 'ab+')
         return file_name
 
 
