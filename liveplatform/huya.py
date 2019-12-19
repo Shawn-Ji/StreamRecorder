@@ -54,7 +54,7 @@ class Huya(LivePlatformBase):
         else:
             return True
 
-    def download_stream(self, room_id, path='.'):
+    def download_stream(self, room_id, path='.', size_limit=None):
         rtmp = self.__get_rtmp(room_id)
         logging.debug(rtmp)
         response = requests.get(

@@ -7,5 +7,5 @@ class LivePlatformBase:
     def probe_room(self, room_id):
         pass
 
-    def download_stream(self, room_id, path):
+    def download_stream(self, room_id, path, size_limit=None):
         pass

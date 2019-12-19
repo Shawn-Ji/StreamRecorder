@@ -6,20 +6,16 @@ import config.config as config
 import logging
 
 
-def probe_and_download(name, live_platform_name, room_id, download_path):
+def probe_and_download(name, live_platform_name, room_id, download_path, size_limit):
     logging.info("{} job".format(name))
 
-
-    # try:
     lp = liveplatform.factory.live_platform_factory(live_platform_name)
     is_streaming = lp.probe_room(room_id)
     if is_streaming:
         logging.info("{} is streaming".format(name))
-        lp.download_stream(room_id, download_path)
+        lp.download_stream(room_id, download_path, size_limit)
     else:
         logging.info("{} not streaming".format(name))
-    # except:
-    #     logging.error("{} task error".format(name))
 
 
 def task_start():
@@ -40,7 +36,8 @@ def task_start():
                 task_data['name'],
                 task_data['live_platform_name'],
                 task_data['room_id'],
-                task_data['download_path']
+                task_data['download_path'],
+                task_data['size_limit']
             ],
             id=task_data['name'],
             minutes=1,

@@ -1,7 +1,7 @@
 import logging
 
 chrome_driver_config = {
-    "executable_path": "util/chromedriver.exe",
+    "executable_path": "C:/Users/yisic/PycharmProjects/StreamRecorder/util/chromedriver.exe",
     "version": None
 }
 
@@ -11,32 +11,33 @@ task_config = [
         "live_platform_name": "douyu",
         "room_id": "120219",
         "download_path": "D:/qike/",
+        "size_limit": 3 * 1024 * 1024 * 1024
         # "download_path": "/mnt/pi_extend/stream/qike/",
     },
-    {
-        "name": "xiao8",
-        "live_platform_name": "douyu",
-        "room_id": "64609",
-        "download_path": "D:/",
-    },
-    {
-        "name": "zard",
-        "live_platform_name": "douyu",
-        "room_id": "60937",
-        "download_path": "D:/",
-    },
-    {
-        "name": "zsmj",
-        "live_platform_name": "douyu",
-        "room_id": "52876",
-        "download_path": "D:/",
-    },
-    {
-        "name": "sansheng",
-        "live_platform_name": "douyu",
-        "room_id": "312407",
-        "download_path": "D:/",
-    },
+    # {
+    #     "name": "xiao8",
+    #     "live_platform_name": "douyu",
+    #     "room_id": "64609",
+    #     "download_path": "D:/",
+    # },
+    # {
+    #     "name": "zard",
+    #     "live_platform_name": "douyu",
+    #     "room_id": "60937",
+    #     "download_path": "D:/",
+    # },
+    # {
+    #     "name": "zsmj",
+    #     "live_platform_name": "douyu",
+    #     "room_id": "52876",
+    #     "download_path": "D:/",
+    # },
+    # {
+    #     "name": "sansheng",
+    #     "live_platform_name": "douyu",
+    #     "room_id": "312407",
+    #     "download_path": "D:/",
+    # },
     # {
     #     "name": "zhou",
     #     "live_platform_name": "douyu",

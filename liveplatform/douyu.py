@@ -6,6 +6,8 @@ from datetime import datetime
 from liveplatform.live_platform_base import LivePlatformBase
 import logging
 import config.config
+import util.util as util
+import sys
 
 
 class Douyu(LivePlatformBase):
@@ -32,7 +34,7 @@ class Douyu(LivePlatformBase):
         driver.get("https://www.douyu.com/{}".format(room_id))
 
         performance_data = driver.get_log("performance")
-        print(performance_data)
+        # print(performance_data)
 
         get_h5_data = None
 
@@ -74,44 +76,31 @@ class Douyu(LivePlatformBase):
         else:
             return False
 
-    def download_stream(self, room_id, path='.'):
+    def download_stream(self, room_id, path='.', size_limit=None):
         rtmp = self.__get_rtmp(room_id)
         logging.debug(rtmp)
-        response = requests.get(
-            url=rtmp,
-            stream='true',
-            headers={
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'
-            }
-        )
-
-        if response.status_code != 200:
-            logging.debug("error when downloading rtmp stream")
-            return None
-        else:
-            logging.debug("download response status code = 200... download start")
-
         file_name = path
         file_name.replace("\\", "/")
         if file_name[-1] != '/':
             file_name = file_name + '/'
         file_name = file_name + "{}_{}.flv".format(room_id, datetime.timestamp(datetime.now()))
-        with open(file_name, 'ab+') as f:
-            counter = 0
-            for chunk in response.iter_content(chunk_size=102400):
-                if chunk:
-                    counter = counter + 1
-                    f.write(chunk)
-                    if counter % 100 == 0:
-                        logging.info("{} stream download: {}M".format(room_id, counter / 100))
-                    f.flush()
-                    # f.close()
-                    # f = open(file_name, 'ab+')
-        return file_name
+        return util.requests_stream_download(
+            rtmp,
+            file_name,
+            size_limit
+        )
 
 
 if __name__ == '__main__':
-    room_id = 64609
+    log = logging.getLogger()
+    log.setLevel(logging.INFO)
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setLevel(logging.INFO)
+    formatter = logging.Formatter("[%(levelname)s]:\t %(message)s")
+    handler.setFormatter(formatter)
+    log.addHandler(handler)
+
+    room_id = 74960
 
     douyu = Douyu()
 
@@ -119,6 +108,6 @@ if __name__ == '__main__':
 
     if is_streaming:
         print("{} is streaming".format(room_id))
-        douyu.download_stream(room_id, "D:/qike/")
+        douyu.download_stream(room_id, "D:/test/", 30*1024*1024)
     else:
         print("{} not streaming".format(room_id))
