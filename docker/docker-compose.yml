@@ -4,13 +4,10 @@ services:
   app:
     build: .
     container_name: stream_recorder_app
-    working_dir: '/src'
-  command: bash run.sh
+    command: bash -c "sh run.sh"
     volumes:
       - '..:/src'
-      - '../video:/video'
-      - '../chromedriver:/chromedriver'
-
+      - '../../video:/video'
     environment:
       - SOURCE_PATH=/src
       - VIDEO_PATH=/video
