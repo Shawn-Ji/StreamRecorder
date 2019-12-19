@@ -5,8 +5,7 @@ services:
     build: .
     container_name: stream_recorder_app
     working_dir: '/src'
-  command:
-      - /bin/bash run.sh
+  command: bash run.sh
     volumes:
       - '..:/src'
       - '../video:/video'
