@@ -1,4 +1,4 @@
 apscheduler
 selenium
 requests
-execjs
+PyExecJs
