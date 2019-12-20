@@ -8,11 +8,65 @@ import logging
 import config.config
 import util.util as util
 import sys
+import execjs
+import uuid
+import time
+import re
 
 
 class Douyu(LivePlatformBase):
-    def __get_rtmp(self, room_id):
 
+    def __get_rtmp(self, room_id):
+        did = uuid.uuid4().hex
+        tt = str(int(time.time()))
+
+        encrypt_alg_origin_js = requests.get("https://www.douyu.com/swf_api/homeH5Enc?rids={}".format(room_id)).content.decode()
+        encrypt_alg_origin_js = json.loads(encrypt_alg_origin_js)["data"]["room{}".format(room_id)]
+        encrypt_alg_origin_js = encrypt_alg_origin_js.replace("eval(strc)","strc;")
+        print(encrypt_alg_origin_js)
+        crypto_js = requests.get('https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js').content.decode()
+        ctx = execjs.compile(crypto_js + ";" + encrypt_alg_origin_js)
+        encrypt_alg_js = ctx.eval('ub98484234(1,1,1)')
+        encrypt_alg_js = encrypt_alg_js[1:encrypt_alg_js.rfind("}")+1]
+        encrypt_alg_js = encrypt_alg_js.replace("function", "function foo")
+        print(encrypt_alg_js)
+        ctx = execjs.compile(crypto_js + ";" + encrypt_alg_js)
+        encrypted_data = ctx.call('foo', room_id, did, tt)
+
+        post_data = {
+            'cdn': 'tct-h5',
+            'did': did,
+            'iar': "1",
+            'ive': "0",
+            'rate': "0",
+            'v': re.search("v=(\d+)", encrypted_data).group(1),
+            'tt': tt,
+            'sign': re.search("sign=(\w+)", encrypted_data).group(1)
+        }
+
+        header = {
+            'Accept': 'application/json, text/plain, */*',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Origin': 'https://www.douyu.com',
+            'Referer': 'https://www.douyu.com/{}'.format(room_id),
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+
+        h5_play_data = requests.post(
+            url="https://www.douyu.com/lapi/live/getH5Play/{}".format(room_id),
+            data=post_data,
+            headers=header
+        )
+
+        h5_play_data = json.loads(h5_play_data.content.decode())
+        if h5_play_data['error'] != 0:
+            return None
+        logging.debug("rtmp live: " + str(h5_play_data['data']['rtmp_url'] + "/" + h5_play_data['data']['rtmp_live']))
+
+        return h5_play_data['data']['rtmp_url'] + "/" + h5_play_data['data']['rtmp_live']
+
+    def get_rtmp_legacy(self, room_id):
         if config.config.chrome_driver_config["version"] is None:
             driver = webdriver.Chrome(
                 executable_path=config.config.chrome_driver_config['executable_path']
@@ -100,7 +154,7 @@ if __name__ == '__main__':
     handler.setFormatter(formatter)
     log.addHandler(handler)
 
-    room_id = 74960
+    room_id = 52876
 
     douyu = Douyu()
 
